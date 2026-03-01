@@ -1,0 +1,23 @@
+{
+  "name": "campuscarry",
+  "version": "1.0.0",
+  "description": "CampusCarry - A Campus Delivery Verification and Token Management System",
+  "keywords": [
+    "campus",
+    "delivery",
+    "verification",
+    "token-management",
+    "nodejs",
+    "api"
+  ],
+  "license": "ISC",
+  "author": "Priyanshu Kumar",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "devDependencies": {
+    "prettier": "3.8.1"
+  }
+}
