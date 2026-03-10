@@ -24,7 +24,23 @@ app.use(
 
 import healthcheckRouter from "./routes/healthcheck.routes.js";
 
+import authRouter from "./routes/auth.routes.js";
+
+
+import orderRoutes from "./routes/order.routes.js";
+import guardRoutes from "./routes/guard.routes.js";
+import tokenRoutes from "./routes/token.routes.js";
+
+
+app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/guard", guardRoutes);
+app.use("/api/v1/token", tokenRoutes);
+
+
+
 app.use("/api/v1/healthcheck", healthcheckRouter);
+app.use("/api/v1/auth", authRouter);
+
 
 app.get("/", (req, res) => {
   res.send("Welcome to basecampy!!");
