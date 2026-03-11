@@ -35,10 +35,6 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
   } = req.body;
 
-  if (!email || !username || !password) {
-    throw new ApiError(400, "Email, username and password are required");
-  }
-
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -95,7 +91,7 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 });
 
-const loginUser = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body;
 
   if (!email && !username) {
@@ -121,20 +117,29 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken",
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
   );
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        user: loggedInUser,
-        accessToken,
-        refreshToken,
-      },
-      "User logged in successfully",
-    ),
-  );
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        },
+        "User logged in successfully",
+      ),
+    );
 });
 
-export { registerUser, loginUser };
+export { registerUser, login };

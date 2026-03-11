@@ -35,6 +35,10 @@ const userRegisterValidator = () => {
       .isMobilePhone()
       .withMessage("Invalid phone number"),
 
+    body("fullName")
+      .optional()
+      .trim(),
+
     body("hostelName").optional().trim(),
 
     body("roomNumber").optional().trim(),
