@@ -38,6 +38,7 @@ app.use("/api/v1/token", tokenRoutes);
 
 
 
+
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/auth", authRouter);
 
