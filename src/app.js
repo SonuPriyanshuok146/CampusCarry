@@ -33,6 +33,10 @@ import guardRoutes from "./routes/guard.routes.js";
 import tokenRoutes from "./routes/token.routes.js";
 import deliveryRoutes from "./routes/delivery.routes.js";
 
+import { errorHandler } from "./middlewares/error.middleware.js";
+
+app.use(errorHandler);
+
 
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/guard", guardRoutes);
