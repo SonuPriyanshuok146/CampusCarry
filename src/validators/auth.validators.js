@@ -22,7 +22,7 @@ const userRegisterValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("Password is required")
-      .isLength({ min: 6 })
+      .isLength({ min: 5 })
       .withMessage("Password must be at least 6 characters"),
 
     body("role")
