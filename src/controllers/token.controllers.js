@@ -3,8 +3,10 @@ import { Order } from "../models/order.models.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import crypto from "crypto";
 
-const assignToken = asyncHandler(async (req, res) => {
+// Generate Pickup Token 
+const generatePickupToken = asyncHandler(async (req, res) => {
   const { orderId } = req.body;
 
   const order = await Order.findById(orderId);
@@ -13,48 +15,40 @@ const assignToken = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Order not found");
   }
 
-  const token = await Token.findOne({ isAvailable: true });
+  const tokenValue = crypto.randomBytes(3).toString("hex");
 
-  if (!token) {
-    throw new ApiError(400, "No tokens available");
+  const token = await Token.create({
+    order: orderId,
+    token: tokenValue,
+    expiresAt: Date.now() + 15 * 60 * 1000,
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, token, "Pickup token generated"));
+});
+
+// Verify Token 
+const verifyPickupToken = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+
+  const tokenDoc = await Token.findOne({ token });
+
+  if (!tokenDoc) {
+    throw new ApiError(404, "Invalid token");
   }
 
-  token.isAvailable = false;
-  token.assignedOrder = order._id;
-  token.assignedByGuard = req.user._id;
-  token.assignedAt = Date.now();
+  if (tokenDoc.expiresAt < Date.now()) {
+    throw new ApiError(400, "Token expired");
+  }
 
-  await token.save();
+  tokenDoc.isUsed = true;
 
-  order.tokenNumber = token._id;
-  order.status = "token_assigned";
-
-  await order.save();
+  await tokenDoc.save();
 
   return res
     .status(200)
-    .json(new ApiResponse(200, token, "Token assigned successfully"));
+    .json(new ApiResponse(200, {}, "Token verified successfully"));
 });
 
-const releaseToken = asyncHandler(async (req, res) => {
-  const { tokenId } = req.body;
-
-  const token = await Token.findById(tokenId);
-
-  if (!token) {
-    throw new ApiError(404, "Token not found");
-  }
-
-  token.isAvailable = true;
-  token.assignedOrder = null;
-  token.assignedByGuard = null;
-  token.assignedAt = null;
-
-  await token.save();
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, token, "Token released successfully"));
-});
-
-export { assignToken, releaseToken };
+export { generatePickupToken, verifyPickupToken };

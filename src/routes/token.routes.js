@@ -1,12 +1,23 @@
 import { Router } from "express";
-import { assignToken, releaseToken } from "../controllers/token.controllers.js";
+
+import {
+  generatePickupToken,
+  verifyPickupToken,
+} from "../controllers/token.controllers.js";
+
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { validate } from "../middlewares/validator.middleware.js";
+
+import { tokenValidator } from "../validators/index.js";
 
 const router = Router();
 
-// guard assigns token to delivery
-router.route("/assign").post(assignToken);
+// Generate pickup token for order 
+router
+  .route("/generate")
+  .post(verifyJWT, tokenValidator(), validate, generatePickupToken);
 
-// release token when student collects parcel
-router.route("/release").post(releaseToken);
+// Verify token at gate 
+router.route("/verify").post(verifyJWT, verifyPickupToken);
 
 export default router;

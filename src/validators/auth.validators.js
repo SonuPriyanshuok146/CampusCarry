@@ -16,38 +16,17 @@ const userRegisterValidator = () => {
       .isLowercase()
       .withMessage("Username must be lowercase")
       .isLength({ min: 3 })
-      .withMessage("Username must be at least 3 characters"),
+      .withMessage("Username must be at least 3 characters long"),
 
-    body("password")
-      .trim()
-      .notEmpty()
-      .withMessage("Password is required")
-      .isLength({ min: 5 })
-      .withMessage("Password must be at least 6 characters"),
+    body("password").trim().notEmpty().withMessage("Password is required"),
 
-    body("role")
-      .optional()
-      .isIn(["student", "guard", "admin"])
-      .withMessage("Role must be student, guard or admin"),
-
-    body("phoneNumber")
-      .optional()
-      .isMobilePhone()
-      .withMessage("Invalid phone number"),
-
-    body("fullName")
-      .optional()
-      .trim(),
-
-    body("hostelName").optional().trim(),
-
-    body("roomNumber").optional().trim(),
+    body("fullName").optional().trim(),
   ];
 };
 
-const loginValidator = () => {
+const userLoginValidator = () => {
   return [
-    body("email").optional().isEmail().withMessage("Invalid email"),
+    body("email").optional().isEmail().withMessage("Email is invalid"),
 
     body("username").optional().trim(),
 
@@ -55,4 +34,32 @@ const loginValidator = () => {
   ];
 };
 
-export { userRegisterValidator, loginValidator };
+const userChangeCurrentPasswordValidator = () => {
+  return [
+    body("oldPassword").notEmpty().withMessage("Old password is required"),
+
+    body("newPassword").notEmpty().withMessage("New password is required"),
+  ];
+};
+
+const userForgotPasswordValidator = () => {
+  return [
+    body("email")
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Email is invalid"),
+  ];
+};
+
+const userResetForgotPasswordValidator = () => {
+  return [body("newPassword").notEmpty().withMessage("Password is required")];
+};
+
+export {
+  userRegisterValidator,
+  userLoginValidator,
+  userChangeCurrentPasswordValidator,
+  userForgotPasswordValidator,
+  userResetForgotPasswordValidator,
+};
